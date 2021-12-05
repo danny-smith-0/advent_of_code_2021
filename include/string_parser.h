@@ -3,6 +3,8 @@
 
 #include <string>
 
+typedef std::vector<std::string> strings_t;
+
 bool find_space_in_string(std::string str_in, size_t* index)
 {
     size_t found = str_in.find(" ");
@@ -37,6 +39,23 @@ std::vector<int> substrings_to_ints(std::string string, std::string delimeter)
         ints.push_back(std::stoi(substr));
     }
     return ints;
+}
+
+strings_t substrings_to_strings(std::string string, std::string delimeter)
+{
+    strings_t strings;
+    std::stringstream s_stream(string);
+    while(s_stream.good())
+    {
+        std::string substr;
+        std::getline(s_stream, substr, *(delimeter.c_str())); //get first string delimited by comma
+        if(substr == "")
+            continue;
+        strings.push_back(substr);
+    }
+    //day 5
+    strings.erase(std::next(strings.begin()));
+    return strings;
 }
 
 #endif // STRING_PARSER_H
