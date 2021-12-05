@@ -14,7 +14,8 @@ int count_max = 0;
 
 std::vector<ints_t> parse_day5()
 {
-    std::ifstream input ("../inputs/day_5_test.txt");
+    // std::ifstream input ("../inputs/day_5_test.txt");
+    std::ifstream input ("../inputs/day_5.txt");
 
     std::vector<ints_t> sets_of_4_ints;
     std::string line;
@@ -25,18 +26,33 @@ std::vector<ints_t> parse_day5()
         sets_of_4_ints.push_back(x1y1x2y2);
     }
 
+    //Succesfully recreates the input strings. No bug here.
     // for (auto set : sets_of_4_ints)
         // std::cout << set[0] << "," << set[1] << " -> " << set[2] << "," << set[3] << "\n";
 
     return sets_of_4_ints;
 }
 
+void check_and_count_max(int cell_value)
+{
+    if ( cell_value > max_value)
+    {
+        max_value = cell_value;
+        count_max = 1;
+    }
+    else if (cell_value == max_value)
+    {
+        count_max++;
+    }
+}
+
 int main ()
 {
     std::vector<ints_t> sets_of_4_ints = parse_day5();
 
-    static constexpr int max_dimension = 10;//00;
-    std::array<std::array<int, max_dimension>, max_dimension> cells = {0};
+    static constexpr int max_dimension = 1000;
+    std::array<std::array<uint8_t, max_dimension>, max_dimension> cells = {0};
+    // std::array<std::array<uint8_t, max_dimension>, max_dimension> cells2 = {0};
     // cells[]
     for (auto set : sets_of_4_ints)
     {
@@ -47,17 +63,10 @@ int main ()
             int max = std::max(set[1], set[3]);
             for ( int ii = min; ii <= max; ++ii)
             {
-                cells.at(ii).at(set[0])++;
-                int current_cell = cells.at(ii).at(set[0]);
-                if ( current_cell > max_value)
-                {
-                    max_value = current_cell;
-                    count_max = 1;
-                }
-                else if (current_cell == max_value)
-                {
-                    count_max++;
-                }
+                cells[ii][set[0]]++;
+                int cell_value = cells[ii][set[0]];
+                check_and_count_max(cell_value);
+
             }
         }
         else if (set[1] == set[3])
@@ -67,37 +76,35 @@ int main ()
             int max = std::max(set[0], set[2]);
             for ( int ii = min; ii <= max; ++ii)
             {
-                cells.at(set[1]).at(ii)++;
-                int current_cell = cells.at(set[1]).at(ii);
-                if ( current_cell > max_value)
-                {
-                    max_value = current_cell;
-                    count_max = 1;
-                }
-                else if (current_cell == max_value)
-                {
-                    count_max++;
-                }
+                cells[set[1]][ii]++;
+                int cell_value = cells[set[1]][ii];
+                check_and_count_max(cell_value);
             }
         }
     }
 
     std::cout << "\n\n" << "max_value: " << max_value << ", " << count_max << " times" << "\n\n";
 
-    // //Plot
+    //Plot
+    // std::ofstream out("out.txt");
     // for (auto rows : cells)
     // {
     //     for (auto cell : rows)
     //     {
     //         if (cell == 0)
-    //             std::cout << ". ";
+    //         {
+    //             // std::cout << ".";
+    //             out << "0,";
+    //         }
     //         else
-    //             std::cout << cell << " ";
+    //         {
+    //             // std::cout << static_cast<int>(cell);// << " ";
+    //             out << static_cast<int>(cell) << ",";
+    //         }
     //     }
-    //     std::cout << "\n";
+    //     // std::cout << "\n";
+    //     out << "\n";
     // }
-
-
 
     return 0;
 }
