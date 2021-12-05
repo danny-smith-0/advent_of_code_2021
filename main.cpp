@@ -53,7 +53,7 @@ struct BingoSquare
         }
         return false;
     }
-    
+
     ints_t all_values()
     {
         ints_t values;
@@ -77,13 +77,15 @@ struct BingoSquare
 
 int main ()
 {
-    std::ifstream input ("C:/Users/danny/OneDrive/Coding/advent_of_coding/cpp/inputs/day_4.txt");
+    std::ifstream input ("../inputs/day_4.txt");
 
+    // Parse the random number draws
     std::string line;
-    std::getline( input, line); //Get the random draws
+    std::getline( input, line);
     // std::cout << "size: " << line.size() << ", " << line << std::endl;
     ints_t rands = substrings_to_ints(line, ",");
 
+    // Parse the bingo squares
     std::vector<BingoSquare> squares;
     BingoSquare square;
     int num_rows = 5;
@@ -93,7 +95,7 @@ int main ()
         // std::cout << "size: " << line.size() << ", " << line << std::endl;
         if(count++ == 0)
             continue;
-        
+
         square.rows.push_back(substrings_to_ints(line, " "));
 
         if(count > num_rows)
@@ -102,31 +104,39 @@ int main ()
             squares.push_back(square);
             square = BingoSquare();
             count = 0;
-        }        
+        }
     }
 
-
+    // Find the first and last bingo winners
+    bool first = true;
+    std::vector<std::string> both_answers;
+    std::stringstream current_result;
     for (size_t ii = 1; ii < rands.size(); ++ii)
     {
         ints_t current_rands(rands.begin(), rands.begin() + ii);
-        int counter = 0;
-        // for (auto square : squares)
-        // for (auto square_iter = squares.begin() ; square_iter != squares.end(); ++square_iter)
         for (auto square_iter = squares.begin() ; square_iter != squares.end(); )
-        {   
+        {
             if(square_iter->bingo(current_rands))
             {
-                int unmarked_score = square_iter->sum_values_not_found(current_rands); 
+                int unmarked_score = square_iter->sum_values_not_found(current_rands);
                 int last_draw = current_rands.at(current_rands.size() - 1);
-                std::cout << unmarked_score << " * " << last_draw << " = " << unmarked_score * last_draw << std::endl;
-                //911 * 96 = 87456
-                // return 0;
+                current_result.str(std::string());
+                current_result << unmarked_score << " * " << last_draw << " = " << unmarked_score * last_draw << std::endl;
+                if (first)
+                {
+                    first = false;
+                    both_answers.push_back(current_result.str());
+                    //911 * 96 = 87456
+                }
                 square_iter = squares.erase(square_iter);
             }
             else
                 ++square_iter;
         }
     }
+    both_answers.push_back(current_result.str());
+
+    std::cout << both_answers[0] << both_answers[1] << std::endl;
 
     return 0;
 }
