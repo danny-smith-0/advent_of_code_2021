@@ -9,8 +9,8 @@
 
 typedef std::vector<int> ints_t;
 
-int max_value = 0;
-int count_max = 0;
+// int max_value = 0;
+int count_2s = 0;
 
 std::vector<ints_t> parse_day5()
 {
@@ -33,19 +33,6 @@ std::vector<ints_t> parse_day5()
     return sets_of_4_ints;
 }
 
-void check_and_count_max(int cell_value)
-{
-    if ( cell_value > max_value)
-    {
-        max_value = cell_value;
-        count_max = 1;
-    }
-    else if (cell_value == max_value)
-    {
-        count_max++;
-    }
-}
-
 int main ()
 {
     std::vector<ints_t> sets_of_4_ints = parse_day5();
@@ -53,9 +40,10 @@ int main ()
     static constexpr int max_dimension = 1000;
     std::array<std::array<uint8_t, max_dimension>, max_dimension> cells = {0};
     // std::array<std::array<uint8_t, max_dimension>, max_dimension> cells2 = {0};
-    // cells[]
+
     for (auto set : sets_of_4_ints)
     {
+        //Only horizontal & vertical
         if (set[0] == set[2])
         {
             //add to cells
@@ -65,8 +53,9 @@ int main ()
             {
                 cells[ii][set[0]]++;
                 int cell_value = cells[ii][set[0]];
-                check_and_count_max(cell_value);
-
+                // check_and_count_max(cell_value);
+                if (cell_value == 2)
+                    count_2s++;
             }
         }
         else if (set[1] == set[3])
@@ -78,14 +67,39 @@ int main ()
             {
                 cells[set[1]][ii]++;
                 int cell_value = cells[set[1]][ii];
-                check_and_count_max(cell_value);
+                // check_and_count_max(cell_value);
+                if (cell_value == 2)
+                    count_2s++;
             }
         }
     }
 
-    std::cout << "\n\n" << "max_value: " << max_value << ", " << count_max << " times" << "\n\n";
 
-    //Plot
+    //the "turn it on its head and burn all your resources" method. - Same wrong result
+    // for (size_t ii = 0; ii < max_dimension; ++ii)
+    // {
+    //     for (size_t jj = 0; jj < max_dimension; ++jj)
+    //     {
+    //         for (auto set : sets_of_4_ints)
+    //         {
+    //             if (set[0] == set[2] || set[1] == set[3])
+    //             {
+    //                 size_t min_x = std::min(set[0], set[2]);
+    //                 size_t max_x = std::max(set[0], set[2]);
+    //                 size_t min_y = std::min(set[1], set[3]);
+    //                 size_t max_y = std::max(set[1], set[3]);
+    //                 if ( ii <= max_y && ii >= min_y && jj <= max_x && jj >= min_x)
+    //                 {
+    //                     check_and_count_max(++cells[ii][jj]);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    std::cout << "\n\n" << /*"max_value: " << max_value << ", " <<*/ count_2s << " times" << "\n\n";
+
+    // // Plot
     // std::ofstream out("out.txt");
     // for (auto rows : cells)
     // {
@@ -93,16 +107,16 @@ int main ()
     //     {
     //         if (cell == 0)
     //         {
-    //             // std::cout << ".";
+    //             std::cout << ".";
     //             out << "0,";
     //         }
     //         else
     //         {
-    //             // std::cout << static_cast<int>(cell);// << " ";
+    //             std::cout << static_cast<int>(cell);// << " ";
     //             out << static_cast<int>(cell) << ",";
     //         }
     //     }
-    //     // std::cout << "\n";
+    //     std::cout << "\n";
     //     out << "\n";
     // }
 
