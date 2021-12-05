@@ -9,6 +9,9 @@
 
 typedef std::vector<int> ints_t;
 
+int max_value = 0;
+int count_max = 0;
+
 std::vector<ints_t> parse_day5()
 {
     std::ifstream input ("../inputs/day_5_test.txt");
@@ -22,8 +25,8 @@ std::vector<ints_t> parse_day5()
         sets_of_4_ints.push_back(x1y1x2y2);
     }
 
-    for (auto set : sets_of_4_ints)
-        std::cout << set[0] << "," << set[1] << " -> " << set[2] << "," << set[3] << "\n";
+    // for (auto set : sets_of_4_ints)
+        // std::cout << set[0] << "," << set[1] << " -> " << set[2] << "," << set[3] << "\n";
 
     return sets_of_4_ints;
 }
@@ -43,7 +46,19 @@ int main ()
             int min = std::min(set[1], set[3]);
             int max = std::max(set[1], set[3]);
             for ( int ii = min; ii <= max; ++ii)
+            {
                 cells.at(ii).at(set[0])++;
+                int current_cell = cells.at(ii).at(set[0]);
+                if ( current_cell > max_value)
+                {
+                    max_value = current_cell;
+                    count_max = 1;
+                }
+                else if (current_cell == max_value)
+                {
+                    count_max++;
+                }
+            }
         }
         else if (set[1] == set[3])
         {
@@ -51,21 +66,36 @@ int main ()
             int min = std::min(set[0], set[2]);
             int max = std::max(set[0], set[2]);
             for ( int ii = min; ii <= max; ++ii)
+            {
                 cells.at(set[1]).at(ii)++;
+                int current_cell = cells.at(set[1]).at(ii);
+                if ( current_cell > max_value)
+                {
+                    max_value = current_cell;
+                    count_max = 1;
+                }
+                else if (current_cell == max_value)
+                {
+                    count_max++;
+                }
+            }
         }
     }
 
-    for (auto rows : cells)
-    {
-        for (auto cell : rows)
-        {
-            if (cell == 0)
-                std::cout << ".";
-            else
-                std::cout << cell;
-        }
-        std::cout << "\n";
-    }
+    std::cout << "\n\n" << "max_value: " << max_value << ", " << count_max << " times" << "\n\n";
+
+    // //Plot
+    // for (auto rows : cells)
+    // {
+    //     for (auto cell : rows)
+    //     {
+    //         if (cell == 0)
+    //             std::cout << ". ";
+    //         else
+    //             std::cout << cell << " ";
+    //     }
+    //     std::cout << "\n";
+    // }
 
 
 
