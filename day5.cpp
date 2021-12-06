@@ -22,6 +22,7 @@ std::vector<ints_t> parse_day5()
     while (std::getline(input, line))
     {
         strings_t two_pairs = substrings_to_strings(line, " -> ");
+        two_pairs.erase(std::next(two_pairs.begin()));
         ints_t x1y1x2y2 = substrings_to_ints(two_pairs.at(0) + "," + two_pairs.at(1), ",");
         sets_of_4_ints.push_back(x1y1x2y2);
     }

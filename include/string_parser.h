@@ -53,8 +53,6 @@ strings_t substrings_to_strings(std::string string, std::string delimeter)
             continue;
         strings.push_back(substr);
     }
-    //day 5
-    strings.erase(std::next(strings.begin()));
     return strings;
 }
 
