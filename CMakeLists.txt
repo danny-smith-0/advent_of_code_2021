@@ -3,7 +3,8 @@ project (advent_of_code_2021)
 
 add_executable ( aoc
     # main.cpp
-    day5.cpp
+    # day5.cpp
+    day6.cpp
 )
 
 target_include_directories ( aoc
