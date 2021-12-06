@@ -6,23 +6,11 @@
 #include <array>
 
 #include <string_parser.h>
+#include <other_aoc_utils.h>
 
 typedef std::vector<int> ints_t;
 
 int count_2s = 0;
-
-ints_t matlab_colon(int first, int last)
-{
-    int incr = first < last ? 1 : -1;
-    ints_t vector;
-    for (int ii = first; ; ii += incr)
-    {
-        vector.push_back(ii);
-        if ( ii == last)
-            break;
-    }
-    return vector;
-}
 
 std::vector<ints_t> parse_day5()
 {
