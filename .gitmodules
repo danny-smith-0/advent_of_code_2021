@@ -1,0 +1,3 @@
+[submodule "ext/aoc_utils"]
+	path = ext/aoc_utils
+	url = https://github.com/danny-smith-0/aoc_utils.git
