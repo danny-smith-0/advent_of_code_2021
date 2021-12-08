@@ -10,7 +10,7 @@ add_executable ( aoc
 	source/day7.cpp
 )
 
-target_include_directories ( aoc
+target_link_libraries( aoc
     PUBLIC
-    include
+    aoc_utils
 )
