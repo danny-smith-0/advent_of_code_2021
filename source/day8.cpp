@@ -54,6 +54,8 @@ std::vector<InputLine> parse8(strings_t data)
         strings_t before_and_after = substrings_to_strings(line, "|");
         out_line.before_delim = substrings_to_strings(before_and_after[0], " ");
         out_line.after_delim  = substrings_to_strings(before_and_after[1], " ");
+        for(auto& entry : out_line.after_delim)
+            std::sort(entry.begin(), entry.end());
         out_data.push_back(out_line);
     }
     return out_data;
@@ -91,10 +93,12 @@ strings_t strings_without_this_char(strings_t inputs, char c)
 strings_t map_input_strings(InputLine line)
 {
     strings_t map (10, "");
+
     //first pass
     strings_t remaining_strings;
-    for (auto entry : line.before_delim)
+    for (auto& entry : line.before_delim)
     {
+        std::sort(entry.begin(), entry.end());
         size_t sz = entry.size();
         if (sz == size1)
             map[1] = entry;
@@ -109,19 +113,24 @@ strings_t map_input_strings(InputLine line)
     }
 
     //find zero - Find the only string that doesn't have the center line. This is the only line only 1 of the remaining dont have.
+    char center_char = '.';
     for (auto c : map[8])
     {
+        //Whoops. The bottom right in 2 is also uniquely gone in the remaining values. Patch with ignoring chars found in 1.
+        if (c == map[1][0] || c == map[1][1])
+            continue;
         strings_t strs_w_o = strings_without_this_char(remaining_strings, c);
         if (strs_w_o.size() == 1)
         {
             map[0] = strs_w_o[0];
             remaining_strings.erase(std::find(remaining_strings.begin(), remaining_strings.end(), strs_w_o[0]));
+            center_char = c;
             break;
         }
     }
 
     //find six - the only remaining string (2,3,5,6,9) size 6 AND missing only one of the chars is 1
-    char char_not_in_six = 0;
+    char top_right_char = '.';
     for (auto c : map[1])
     {
         bool found_it = false;
@@ -132,7 +141,7 @@ strings_t map_input_strings(InputLine line)
             {
                 map[6] = str;
                 remaining_strings.erase(std::find(remaining_strings.begin(), remaining_strings.end(), str));
-                char_not_in_six = c;
+                top_right_char = c;
                 found_it = true;
                 break;
             }
@@ -152,8 +161,8 @@ strings_t map_input_strings(InputLine line)
         }
     }
 
-    //find five - of remaining (2,3,5), only 5 doesn't have the char missing is 6.
-    strings_t strs_w_o_char6 = strings_without_this_char(remaining_strings, char_not_in_six);
+    //find five - of remaining (2,3,5), only 5 doesn't have the top right char
+    strings_t strs_w_o_char6 = strings_without_this_char(remaining_strings, top_right_char);
     map[5] = strs_w_o_char6[0];
     remaining_strings.erase(std::find(remaining_strings.begin(), remaining_strings.end(), strs_w_o_char6[0]));
 
@@ -172,12 +181,33 @@ strings_t map_input_strings(InputLine line)
     return map;
 }
 
+int get_four_digit_Code(strings_t line, strings_t map)
+{
+    if(line.size() != 4)
+        return 0;
+
+    int code = 0;
+    for (size_t digit = 0; digit < map.size(); ++digit)
+    {
+        if(line[0] == map[digit])
+            code += 1000 * digit;
+        if(line[1] == map[digit])
+            code +=  100 * digit;
+        if(line[2] == map[digit])
+            code +=   10 * digit;
+        if(line[3] == map[digit])
+            code +=    1 * digit;
+    }
+    return code;
+}
+
 int sum_part2(std::vector<InputLine> lines)
 {
     int sum = 0;
     for (auto line : lines)
     {
-        map_input_strings(line);
+        strings_t map = map_input_strings(line);
+        sum += get_four_digit_Code(line.after_delim, map);
     }
     return sum;
 }
