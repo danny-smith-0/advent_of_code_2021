@@ -77,7 +77,7 @@ struct BingoSquare
 
 int main ()
 {
-    std::ifstream input ("../inputs/day_4.txt");
+    std::ifstream input ("../inputs/day4.txt");
 
     // Parse the random number draws
     std::string line;

@@ -14,8 +14,8 @@ int count_2s = 0;
 
 std::vector<ints_t> parse_day5()
 {
-    // std::ifstream input ("../inputs/day_5_test.txt");
-    std::ifstream input ("../inputs/day_5.txt");
+    // std::ifstream input ("../inputs/day5_test.txt");
+    std::ifstream input ("../inputs/day5.txt");
 
     std::vector<ints_t> sets_of_4_ints;
     std::string line;
@@ -83,7 +83,7 @@ int main ()
         if (ys.size() != xs.size())
             std::cout << "Size error!\n";
         int kk = set[0];
-        for (int ii = 0; ii < xs.size() ; ++ii)
+        for (size_t ii = 0; ii < xs.size() ; ++ii)
         {
             int cell_value = ++cells[ys[ii]][xs[ii]];
             if (cell_value == 2)
@@ -91,7 +91,7 @@ int main ()
         }
     }
 
-    std::cout << "\n\n" << /*"max_value: " << max_value << ", " <<*/ count_2s << " times" << "\n\n";
+    std::cout << /*"\n\n" << "max_value: " << max_value << ", " <<*/ count_2s << " times" << "\n\n";
 
     // Plot
     std::ofstream out("out.txt");

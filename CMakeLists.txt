@@ -4,9 +4,9 @@ project (advent_of_code_2021)
 add_subdirectory(ext/aoc_utils)
 
 add_executable ( aoc
-    # main.cpp
-    # day5.cpp
-    # day6.cpp
+    # source/day4.cpp
+    # source/day5.cpp
+    # source/day6.cpp
 	source/day7.cpp
 )
 
