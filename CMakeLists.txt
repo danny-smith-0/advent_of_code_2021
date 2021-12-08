@@ -7,7 +7,8 @@ add_executable ( aoc
     # source/day4.cpp
     # source/day5.cpp
     # source/day6.cpp
-	source/day7.cpp
+	# source/day7.cpp
+	source/day8.cpp
 )
 
 target_link_libraries( aoc
