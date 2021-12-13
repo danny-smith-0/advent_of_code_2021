@@ -59,7 +59,7 @@ bool closes_last(Chunks chunk, char closer)
     return closes_last(chunk.last_opened(), closer);
 }
 
-int score_closer(char in)
+sll score_closer(char in)
 {
     switch (in)
     {
@@ -72,14 +72,14 @@ int score_closer(char in)
     return 0;
 }
 
-int part1(strings_t input)
+sll part1(strings_t input)
 {
-    int score = 0;
-    int debug_line = -1;
+    sll score = 0;
+    sll debug_line = -1;
     for (auto str : input)
     {
         ++debug_line;
-        int debug_col = -1;
+        sll debug_col = -1;
         Chunks chunks;
         bool success = true;
         for (auto my_char : str)
@@ -94,11 +94,11 @@ int part1(strings_t input)
                 else
                 {
                     success = false;
-                    int old_score = score;
-                    int add_to_score = score_closer(my_char);
+                    sll old_score = score;
+                    sll add_to_score = score_closer(my_char);
                     score += add_to_score;
-                    std::cout << "Line " << debug_line << " ERROR. Remaining: " << chunks.opened << ". Input: " << my_char << /*"\n" <<*/ " at column " << debug_col << "";
-                    std::cout << ". Score: " << old_score << " + " << add_to_score << " = " << score << "\n";
+                    // std::cout << "Line " << debug_line << " ERROR. Remaining: " << chunks.opened << ". Input: " << my_char << /*"\n" <<*/ " at column " << debug_col << "";
+                    // std::cout << ". Score: " << old_score << " + " << add_to_score << " = " << score << "\n";
                     break;
                 }
 
@@ -106,9 +106,56 @@ int part1(strings_t input)
             else
                 std::cout << "whoops! (" << debug_line << ", " << debug_col << "\n";
         }
-        if (success) { std::cout << "Line " << debug_line << " done.  Remaining: " << chunks.opened << "\n"; }
+        // if (success) { std::cout << "Line " << debug_line << " done.  Remaining: " << chunks.opened << "\n"; }
     }
     return score;
+}
+
+sll part2(strings_t input)
+{
+    strings_t part2;
+    //Get incompletes
+    for (auto str : input)
+    {
+        Chunks chunks;
+        bool success = true;
+        for (auto my_char : str)
+        {
+            if (is_open_char(my_char))            { chunks.open_chunk(my_char); }
+            else if (is_close_char(my_char))
+            {
+                if (closes_last(chunks, my_char)) { chunks.close_chunk(my_char); }
+                else                              { success = false; break; }
+            }
+        }
+        if (success) { part2.push_back(chunks.opened); }
+    }
+    //Score remaining incomplete:
+    sll total_score = 0;
+    std::vector<sll> scores;
+    for (auto str : part2)
+    {
+        sll score = 0;
+        while (!str.empty())
+        {
+            char last_char = str.at(str.size() - 1);
+            str.pop_back();
+            score *= 5;
+            switch (last_char)
+            {
+                case '(': { score += 1; break; }
+                case '[': { score += 2; break; }
+                case '{': { score += 3; break; }
+                case '<': { score += 4; break; }
+                default:  std::cout << "fail\n";
+            }
+        }
+        scores.push_back(score);
+    }
+    std::sort(scores.begin(), scores.end());
+    size_t middle_index = static_cast<size_t>((scores.size() - 1) / 2 );
+
+    return scores[middle_index];
 }
 
 int main ()
@@ -119,16 +166,18 @@ int main ()
     std::cout << "Day " << day_string << std::endl;
 
 
-    std::cout << "test stuff: \n";
-    int results_test_1 = part1(test_data);
-    std::cout << "\nreal stuff: \n";
-    int results_real_1 = part1(real_data);
+    // std::cout << "test stuff: \n";
+    sll results_test_1 = part1(test_data);
+    // std::cout << "\nreal stuff: \n";
+    sll results_real_1 = part1(real_data);
+    sll expected_test_result_1 = 26397;
 
-    int results_test_2 = 0;
-    int results_real_2 = 0;
+    sll results_test_2 = part2(test_data);
+    sll results_real_2 = part2(real_data);
 
-    results(results_test_1, 26397, results_real_1); //266517 is too low
-    results(results_test_2, 0, results_real_2);
+    sll expected_test_result_2 = 288957;
+    results(results_test_1, expected_test_result_1, results_real_1); // 266517 is too low
+    results(results_test_2, expected_test_result_2, results_real_2); // 204602241 is too low
 
     return 0;
 }
