@@ -5,13 +5,15 @@ struct InputData
     bools_t_2d dots;
     strings_t_2d folds;
 
-    InputData(strings_t data) { parse13(data); }
-    void parse13(strings_t data)
+    InputData(strings_t data) { parse(data); }
+
+    void parse(strings_t data)
     {
         bool collect_dots_not_folds = true;
         ints_t_2d coords;
         int max_x = 0;
         int max_y = 0;
+        //Get coords (to become dots) & folds
         for (auto str : data)
         {
             if (str.empty()) // At the empty line, switch input collection
@@ -57,8 +59,9 @@ struct InputData
                     if (fold_line + diff > static_cast<int>(row.size()) - 1)
                         break;
                     row[fold_line - diff] = row[fold_line - diff] || row[fold_line + diff];
-                    row[fold_line + diff] = false;
                 }
+                // Remove columns to the right of the fold
+                row = bools_t(row.begin(), row.begin() + fold_line);
             }
         }
         if (fold[0] == "y")
@@ -72,18 +75,17 @@ struct InputData
                     if (fold_line + diff > static_cast<int>(dots.size()) - 1)
                         break;
                     dots[fold_line - diff][ii] = dots[fold_line - diff][ii] || dots[fold_line + diff][ii];
-                    dots[fold_line + diff][ii] = false;
                 }
             }
+            //Remove row below the fold
+            dots = bools_t_2d(dots.begin(), dots.begin() + fold_line);
         }
     }
 
     void do_all_folds()
     {
         while (!folds.empty())
-        {
             this->fold();
-        }
     }
 };
 
@@ -96,33 +98,31 @@ int main ()
 
     InputData test(test_data);
     InputData real(real_data);
-    // print_T_2d(test.dots);
-    std::cout << count_bools_t_2d(real.dots) << "\n";
 
+    //Part 1
     test.fold();
     real.fold();
 
     int results_test_1 = count_bools_t_2d(test.dots);
     int results_real_1 = count_bools_t_2d(real.dots); //866 is too high;
+    results(results_test_1, 17, results_real_1);
 
+    //Part 2
     test.do_all_folds();
-    print_T_2d(test.dots);
+    bool with_comma = false;
+    bool null_is_space = true;
+    std::cout << std::endl;
+    print_T_2d(test.dots, with_comma, null_is_space);
 
     real.do_all_folds();
-    print_T_2d(real.dots);
+    print_T_2d(real.dots, with_comma, null_is_space);
 
-    // 1111010010011001001001100111101001001100
-    // 0001010100100101001010010100001001010010
-    // 0010011000100101001010000111001001010000
-    // 0100010100111101001010000100001001010000
-    // 1000010100100101001010010100001001010010
-    // 1111010010100100110001100100000110001100
-
-    int results_test_2 = 0;
-    int results_real_2 = 0;
-
-    results(results_test_1, 17, results_real_1);
-    results(results_test_2, 0, results_real_2);
+    // 1111 1  1  11  1  1  11  1111 1  1  11
+    //    1 1 1  1  1 1  1 1  1 1    1  1 1  1
+    //   1  11   1  1 1  1 1    111  1  1 1
+    //  1   1 1  1111 1  1 1    1    1  1 1
+    // 1    1 1  1  1 1  1 1  1 1    1  1 1  1
+    // 1111 1  1 1  1  11   11  1     11   11
 
     return 0;
 }
