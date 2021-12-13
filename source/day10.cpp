@@ -38,15 +38,8 @@ struct Chunks
     }
 };
 
-bool is_open_char(char in)
-{
-    return in == 0x28 || in == 0x3C || in == 0x5B || in == 0x7B;
-}
-
-bool is_close_char(char in)
-{
-    return in == 0x29 || in == 0x3E || in == 0x5D || in == 0x7D;
-}
+bool is_open_char(char in)  { return in == '(' || in == '<' || in == '[' || in == '{'; }
+bool is_close_char(char in) { return in == ')' || in == '>' || in == ']' || in == '}'; }
 
 bool closes_last(char last, char closer)
 {
@@ -71,9 +64,9 @@ int score_closer(char in)
     switch (in)
     {
         case ')': { return     3; }
-        case '>': { return    57; }
-        case ']': { return  1197; }
-        case '}': { return 25137; }
+        case ']': { return    57; }
+        case '}': { return  1197; }
+        case '>': { return 25137; }
         default:  std::cout << "fail\n";
     }
     return 0;
@@ -88,6 +81,7 @@ int part1(strings_t input)
         ++debug_line;
         int debug_col = -1;
         Chunks chunks;
+        bool success = true;
         for (auto my_char : str)
         {
             ++debug_col;
@@ -99,16 +93,20 @@ int part1(strings_t input)
                     chunks.close_chunk(my_char);
                 else
                 {
+                    success = false;
                     int old_score = score;
                     int add_to_score = score_closer(my_char);
                     score += add_to_score;
-                    std::cout << "Error with " << my_char << /*"\n" <<*/ " at (" << debug_line << ", " << debug_col << "). Expected to close " << chunks.last_opened();
-                    std::cout << ". " << old_score << " + " << add_to_score << " = " << score << "\n";
+                    std::cout << "Line " << debug_line << " ERROR. Remaining: " << chunks.opened << ". Input: " << my_char << /*"\n" <<*/ " at column " << debug_col << "";
+                    std::cout << ". Score: " << old_score << " + " << add_to_score << " = " << score << "\n";
                     break;
                 }
 
             }
+            else
+                std::cout << "whoops! (" << debug_line << ", " << debug_col << "\n";
         }
+        if (success) { std::cout << "Line " << debug_line << " done.  Remaining: " << chunks.opened << "\n"; }
     }
     return score;
 }
@@ -123,7 +121,7 @@ int main ()
 
     std::cout << "test stuff: \n";
     int results_test_1 = part1(test_data);
-    std::cout << "real stuff: \n";
+    std::cout << "\nreal stuff: \n";
     int results_real_1 = part1(real_data);
 
     int results_test_2 = 0;
