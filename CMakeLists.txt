@@ -4,15 +4,16 @@ project (advent_of_code_2021)
 add_subdirectory(ext/aoc_utils)
 
 add_executable ( aoc
-    # source/day4.cpp
-    # source/day5.cpp
-    # source/day6.cpp
-	# source/day7.cpp
-	# source/day8.cpp
-	# source/day9.cpp
+    # source/day04.cpp
+    # source/day05.cpp
+    # source/day06.cpp
+	# source/day07.cpp
+	# source/day08.cpp
+	# source/day09.cpp
 	# source/day10.cpp
 	# source/day11.cpp
-	source/day13.cpp
+	source/day12.cpp
+	# source/day13.cpp
 )
 
 target_link_libraries( aoc
