@@ -52,8 +52,10 @@ struct InputData
 
             for (auto& row : dots)
             {
-                for (int diff = 1; diff < fold_line; ++diff)
+                for (int diff = 1; diff <= fold_line; ++diff)
                 {
+                    if (fold_line + diff > static_cast<int>(row.size()) - 1)
+                        break;
                     row[fold_line - diff] = row[fold_line - diff] || row[fold_line + diff];
                     row[fold_line + diff] = false;
                 }
@@ -65,8 +67,10 @@ struct InputData
 
             for (size_t ii = 0; ii < dots[0].size(); ++ii)
             {
-                for (int diff = 1; diff < fold_line; ++diff)
+                for (int diff = 1; diff <= fold_line; ++diff)
                 {
+                    if (fold_line + diff > static_cast<int>(dots.size()) - 1)
+                        break;
                     dots[fold_line - diff][ii] = dots[fold_line - diff][ii] || dots[fold_line + diff][ii];
                     dots[fold_line + diff][ii] = false;
                 }
@@ -103,6 +107,16 @@ int main ()
 
     test.do_all_folds();
     print_T_2d(test.dots);
+
+    real.do_all_folds();
+    print_T_2d(real.dots);
+
+    // 1111010010011001001001100111101001001100
+    // 0001010100100101001010010100001001010010
+    // 0010011000100101001010000111001001010000
+    // 0100010100111101001010000100001001010000
+    // 1000010100100101001010010100001001010010
+    // 1111010010100100110001100100000110001100
 
     int results_test_2 = 0;
     int results_real_2 = 0;
