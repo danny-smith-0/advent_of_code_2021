@@ -56,14 +56,12 @@ sll part1(std::string polymer, strings_t_2d rules, size_t nn)
         std::cout << std::endl;
     }
 
-    std::vector<sll> counts;
-
-
     std::string unique_chars = polymer;
     std::sort(unique_chars.begin(), unique_chars.end());
     auto last = std::unique(unique_chars.begin(), unique_chars.end());
     unique_chars.erase(last, unique_chars.end());
 
+    slls_t counts;
     for (auto my_char : unique_chars)
         counts.push_back(std::count(polymer.begin(), polymer.end(), my_char));
     std::sort(counts.begin(), counts.end());
@@ -73,6 +71,11 @@ sll part1(std::string polymer, strings_t_2d rules, size_t nn)
     sll diff = max - min;
     std::cout << max << " - " << min << " = " << diff << "\n";
     return diff;
+}
+
+std::map<strings_t, slls_t> predict_rule_growth(strings_t_2d rules)
+{
+
 }
 
 sll part2(std::string polymer, strings_t_2d rules, size_t nn)
