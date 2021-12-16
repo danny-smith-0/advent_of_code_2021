@@ -45,12 +45,30 @@ bool cells_are_neighbors(coords_t const& cell1, coords_t const& cell2)
     return false;
 }
 
-coords_t_vec remove_options_next_to_path(coords_t_vec const& path, coords_t_vec const& possible_options)
+coords_t_vec remove_options_next_to_path(coords_t_vec const& path, coords_t_vec const& possible_options, ints_t_2d* map = 0, coords_t cell = coords_t(0,0))
 {
     coords_t_vec next_options(possible_options);
+    //Dont go left on the bottom or top, up on the right or left
+    if(map && true)
+    {
+        coords_t_vec disallowed_cells;
+        if (cell.second > 0 && (cell.first > map->size() - 3 || cell.first < 3))
+            disallowed_cells.push_back(coords_t(cell.first, cell.second - 1));
+        else if (cell.first > 0 && (cell.second > map[0].size() - 3 || cell.second < 3 ))
+            disallowed_cells.push_back(coords_t(cell.first - 1, cell.second));
+
+        for (auto disallowed_cell : disallowed_cells)
+            for (coords_t_vec::iterator option_iter = next_options.begin(); option_iter != next_options.end(); )
+                if (*option_iter == disallowed_cell)
+                    option_iter = next_options.erase(option_iter);
+                else
+                    ++option_iter;
+    }
+
     for (size_t ii = 0; ii < path.size() - 2; ++ii)
     {
-        for (auto disallowed_cell : get_neighbors(path[ii]))
+        coords_t_vec neighbors = get_neighbors(path[ii]);
+        for (auto disallowed_cell : neighbors)
         {
             for (coords_t_vec::iterator option_iter = next_options.begin(); option_iter != next_options.end(); )
                 if (*option_iter == disallowed_cell)
@@ -60,6 +78,72 @@ coords_t_vec remove_options_next_to_path(coords_t_vec const& path, coords_t_vec 
         }
     }
     return next_options;
+}
+
+bool my_func(std::vector<coords_t_vec>& paths, ints_t_2d const& map, coords_t_vec const& path)
+{
+    bool good_path = true;
+    for (std::vector<coords_t_vec>::iterator other_path_iter = paths.begin(); other_path_iter != paths.end(); ++other_path_iter)
+    {
+        if (path.at(path.size() - 1) == other_path_iter->at(other_path_iter->size() - 1))
+        {
+            if ( score_path(path, map) < score_path(*other_path_iter, map))
+            {
+                *other_path_iter = path;
+            }
+            good_path = false;
+            break;
+        }
+    }
+    return good_path;
+}
+
+bool my_func2(std::vector<coords_t_vec>& paths, ints_t_2d const& map, coords_t_vec const& path)
+{
+    bool good_path = true;
+    for (std::vector<coords_t_vec>::iterator other_path_iter = paths.begin(); other_path_iter != paths.end(); ++other_path_iter)
+    {
+        bool path_wins = false;
+        coords_t_vec replacement_path(path);
+        for (coords_t_vec::iterator cell_iter = other_path_iter->begin(); cell_iter != other_path_iter->end(); ++cell_iter)
+        {
+            if (path_wins)
+            {
+                replacement_path.push_back(*cell_iter);
+            }
+            else if (path.at(path.size() - 1) == *cell_iter)
+            {
+
+                coords_t_vec partial_path(other_path_iter->begin(), cell_iter + 1);
+                sll path_score = score_path(path, map);
+                sll partial_path_score = score_path(partial_path, map);
+                if (path_score < partial_path_score)
+                {
+                    path_wins = true;
+                }
+
+                good_path = false;
+            }
+        }
+
+        if (path_wins)
+            *other_path_iter = replacement_path;
+    }
+    return good_path;
+}
+
+void print_path_map_to_file(std::string filename, std::vector<coords_t_vec> paths, size_t dimension = 0)
+{
+    std::ofstream outfile;
+    outfile.open(filename);
+    for (auto path : paths)
+    {
+        bools_t_2d path_map = coords_to_bools(path, dimension, dimension);
+        std::string str = print_T_2d_to_string(path_map);
+        outfile << str << "\n";
+        outfile << "\n";
+    }
+    outfile.close();
 }
 
 std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
@@ -79,17 +163,29 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
         paths.push_back(path4);
     }
 
+    sll count = 0;
+    bool clear_dead_ends = false;
+    bool last_was_a_cleared_deadend = false;
     for (std::vector<coords_t_vec>::iterator path_iter = paths.begin(); path_iter != paths.end(); )
     {
-        static sll count = 0;
-        ++count;
-        if (count % 10000 == 0)
-            std::cout << count << "\n";
+        if (++count % 100000 == 0 || (count > 2700000 && count % 100 == 0))
+        {
+            std::cout << count << " - paths.size() = " << paths.size() << "\n";
+            if (true)
+            {
+                std::stringstream filename;
+                filename << "day15_mapsize_" << map.size() << "_count_" << count << "_paths_" << paths.size() << ".txt";
+                print_path_map_to_file(filename.str(), paths, map.size());
+            }
+        }
+        clear_dead_ends = false;//last_was_a_cleared_deadend || count % 10000 == 0;
+        last_was_a_cleared_deadend = false;
 
         // Safety
         if (path_iter->empty())
         {
             path_iter = paths.erase(path_iter);
+            std::cout << "WOAH! EMPTY! BAD!\n";
             continue;
         }
 
@@ -101,14 +197,22 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
             continue;
         }
         coords_t_vec next_options = get_neighbors(cell, &map);
-        next_options = remove_options_next_to_path(*path_iter, next_options);
+        // next_options = remove_options_next_to_path(*path_iter, next_options);
+        next_options = remove_options_next_to_path(*path_iter, next_options, &map, cell);
 
 
         // Make the new paths if there are any to make
         if (next_options.empty())
         {
-            path_iter = paths.erase(path_iter);
-            continue; // maybe unecessary
+            // I have decided that not clearing deadends may the reason it's "faster" but also not optimal. We're only
+            // if (clear_dead_ends)
+            // {
+                path_iter = paths.erase(path_iter);
+            //     last_was_a_cleared_deadend = true;
+            // }
+            // else
+                // ++path_iter;
+            continue;
         }
         else
         {
@@ -123,23 +227,17 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
                 new_paths.push_back(new_path);
             }
 
-            //First pass, only check if END-POINTS match
+            //Check if the ends of these routes hit a previoulsy found route. Edit if necessary
+            bool a_new_path_finished = false; //debug
             std::vector<coords_t_vec> good_paths;
             for (auto path : new_paths)
             {
-                bool good_path = true;
-                for (std::vector<coords_t_vec>::iterator other_path_iter = paths.begin(); other_path_iter != paths.end(); ++other_path_iter)
-                {
-                    if (path.at(path.size() - 1) == other_path_iter->at(other_path_iter->size() - 1))
-                    {
-                        if ( score_path(path, map) < score_path(*other_path_iter, map))
-                        {
-                            *other_path_iter = path;
-                        }
-                        good_path = false;
-                        break;
-                    }
-                }
+                coords_t cell = path[path.size() - 1];
+                if (cell.first == max_row && cell.second == max_col)
+                    a_new_path_finished = true;
+
+                // bool good_path = my_func(paths, map, path);
+                bool good_path = my_func2(paths, map, path);
                 if (good_path)
                     good_paths.push_back(path);
             }
@@ -147,40 +245,43 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
             for (auto path : good_paths)
                 paths.push_back(path);
 
+            if (a_new_path_finished) //debug
+            {
+                std::stringstream filename;
+                filename << "day15_mapsize_" << map.size() << "_count_" << count << "_paths_" << paths.size() << "_found_new_finish.txt";
+                print_path_map_to_file(filename.str(), paths, map.size());
+            }
 
             // We invalidated the iterator, so lets start at the beginning and do a different path
             path_iter = paths.begin();
-
-            // //////
-            // std::vector<coords_t_vec> new_paths;
-            // for (size_t ii = 0; ii < next_options.size(); ++ii)
-            // {
-            //     coords_t_vec new_path(base_path);
-            //     new_path.push_back(next_options[ii]);
-            //     new_paths.push_back(new_path);
-            // }
-            // //Check if these new paths end on a point inside of an already planned path. If so, score these two.
-            // for (std::vector<coords_t_vec>::iterator other_path_iter = paths.begin(); other_path_iter != paths.end(); )
-            // //////
-
         }
 
     }
-    auto last = std::unique(paths.begin(), paths.end());
-    if (last != paths.end())
+    std::cout << "last count was " << count << ". paths.size() " << paths.size() << std::endl;
+
+    //Delete any paths that don't end at the end
+    for (std::vector<coords_t_vec>::iterator path_iter = paths.begin(); path_iter != paths.end(); )
     {
-        std::cout << "There are non-unique paths\n";
+        coords_t cell = path_iter->at(path_iter->size() - 1);
+        if (cell.first != max_row || cell.second != max_col)
+            path_iter = paths.erase(path_iter);
+        else
+            ++path_iter;
     }
+    std::cout << "After removing dead-ends, paths.size() " << paths.size() << std::endl;
+    std::stringstream filename;
+    filename << "day15_mapsize_" << map.size() << "_final_count_" << count << "_paths_" << paths.size() << ".txt";
+    print_path_map_to_file(filename.str(), paths, map.size());
     return paths;
 }
 
 sll part1(ints_t_2d map)
 {
     std::vector<coords_t_vec> paths = plan_possible_paths(map);
-    std::cout << paths.size() << "\n";
     sll out = 0;
     if (paths.size() > 0)
         out = score_path(paths[0], map);
+    std::cout << paths.size() << " routes. Score = " << out << "\n";
     return out;
 }
 
@@ -197,22 +298,28 @@ int main ()
     ints_t_2d test_data = parse(get_strings_from_file("../inputs/day" + day_string + "_test.txt"));
     ints_t_2d real_data = parse(get_strings_from_file("../inputs/day" + day_string + ".txt"));
 
+    // bool with_comma = true;
+    // print_T_2d(test_data, with_comma); std::cout << "\n\n"; print_T_2d(real_data, with_comma);
+
     ints_t_2d threebythree (3, ints_t(3, 1));
     ints_t_2d fourbyfour (4, ints_t(4, 1));
 
+    std::cout << "3x3: ";
     sll res3 = part1(threebythree);
+    std::cout << "4x4: ";
     sll res4 = part1(fourbyfour);
 
+    std::cout << "test: ";
     sll expected_test_result_1 = 40;
     sll results_test_1 = part1(test_data);
-    sll results_real_1 = 0;//part1(real_data);
+    sll results_real_1 = 0;
     std::cout << "Test result is " << results_test_1;
     if (results_test_1 == expected_test_result_1)
     {
         std::cout << ". Passed!\n";
         std::cout << "Real result is ";
         results_real_1 = part1(real_data);
-        std::cout << "\n" << part1(real_data) << std::endl;
+        std::cout << "\n" << results_real_1 << std::endl;
     }
     else
         std::cout << ". Failed. Looking for " << expected_test_result_1 << "\n";
@@ -221,7 +328,7 @@ int main ()
     sll results_real_2 = part2(real_data);
     sll expected_test_result_2 = 0;
 
-    results(results_test_1, expected_test_result_1, results_real_1);
+    results(results_test_1, expected_test_result_1, results_real_1); //594 is too high. 435 is right for someone else. I tried 501. Nope. Took about 37 minutes.
     results(results_test_2, expected_test_result_2, results_real_2);
 
     return 0;
