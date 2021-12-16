@@ -256,12 +256,17 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
 
             //Check if the ends of these routes hit a previoulsy found route. Edit if necessary
             bool a_new_path_finished = false; //debug
+            sll new_potential_answer = 0;
             std::vector<coords_t_vec> good_paths;
             for (auto path : new_paths)
             {
                 coords_t cell = path[path.size() - 1];
                 if (cell.first == max_row && cell.second == max_col)
+                {
                     a_new_path_finished = true;
+                    new_potential_answer = score_path(path, map);
+                    std::cout << "new_potential_answer " << new_potential_answer << "\n";
+                }
 
                 // bool good_path = my_func(paths, map, path);
                 bool good_path = my_func2(paths, map, path);
@@ -275,7 +280,7 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
             if (a_new_path_finished) //debug
             {
                 std::stringstream filename;
-                filename << "day15_mapsize_" << map.size() << "_count_" << count << "_paths_" << paths.size() << "_found_new_finish.txt";
+                filename << "day15_mapsize_" << map.size() << "_count_" << count << "_paths_" << paths.size() << "_found_new_finish__score_" << new_potential_answer <<".txt";
                 print_path_map_to_file(filename.str(), paths, map.size());
             }
 
