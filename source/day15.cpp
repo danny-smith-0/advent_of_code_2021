@@ -403,7 +403,7 @@ int main ()
         std::cout << ". Passed!\n";
         std::cout << "Real result is ";
         results_real_2 = part2(real_data, tiles);
-        std::cout << results_real_2 << std::endl;
+        std::cout << results_real_2 << std::endl; // 3188 is too high, 2096 is too low
     }
     else
         std::cout << ". Failed. Looking for " << expected_test_result_2 << "\n";
