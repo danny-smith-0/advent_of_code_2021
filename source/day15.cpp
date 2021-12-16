@@ -1,5 +1,7 @@
 #include <advent_of_code.h>
 
+#define PRINT_LENGTH_ASSUMPTION_COMMENTS 0
+
 ull count_assumed_calls = 0;
 ull count_assumed_triggers = 0;
 
@@ -147,14 +149,17 @@ bool assume_the_optimal_path_doesnt_double_back_toooooo_much(coords_t_vec path)
     }
 
     size_t length_of_shortest_path_thru_bounding_box = max_1st_idx + max_2nd_idx + 1;
-    size_t assumed_max_path_length = (length_of_shortest_path_thru_bounding_box * 7) / 4 + 1;
+    // size_t assumed_max_path_length = (length_of_shortest_path_thru_bounding_box * 7) / 4 + 1;
+    size_t assumed_max_path_length = (length_of_shortest_path_thru_bounding_box * 4) / 3 + 1;
     size_t path_length = path.size();
     bool not_toooooo_long = path_length < assumed_max_path_length;
 
     {
         count_assumed_triggers += not_toooooo_long ? 0 : 1;
-        if (count_assumed_triggers > 0 && count_assumed_triggers % 1000 == 0)
-            std::cout << "\"Assumed\" calls, triggers, and percentage: " << count_assumed_calls << ", " << count_assumed_triggers << ", " << static_cast<double>(count_assumed_triggers)/static_cast<double>(count_assumed_calls) << "\n";
+        #if PRINT_LENGTH_ASSUMPTION_COMMENTS
+            if (count_assumed_triggers > 0 && count_assumed_triggers % 1000 == 0)
+                std::cout << "\"Assumed\" calls, triggers, and percentage: " << count_assumed_calls << ", " << count_assumed_triggers << ", " << static_cast<double>(count_assumed_triggers)/static_cast<double>(count_assumed_calls) << "\n";
+        #endif // PRINT_LENGTH_ASSUMPTION_COMMENTS
     }
     return not_toooooo_long;
 }
@@ -195,7 +200,7 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
     count_assumed_triggers = 0;
     for (std::vector<coords_t_vec>::iterator path_iter = paths.begin(); path_iter != paths.end(); )
     {
-        if (++count % 50000 == 0)// || (count > 2700000 && count % 100 == 0))
+        if (++count % 50000 == 0)
         {
             std::cout << count << " - paths.size() = " << paths.size() << " saving to file"<< "\n";
             if (true)
@@ -206,7 +211,7 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
                 std::cout << "Finished saving to file\n";
             }
         }
-        else if (++count % 10000 == 0)
+        else if (count % 10000 == 0)
         {
             std::cout << count << " - paths.size() = " << paths.size() << "\n";
         }
@@ -280,7 +285,9 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
 
     }
     std::cout << "last count was " << count << ". paths.size() " << paths.size() << std::endl;
-    std::cout << "\"Assumed\" calls, triggers, and percentage: " << count_assumed_calls << ", " << count_assumed_triggers << ", " << static_cast<double>(count_assumed_triggers)/static_cast<double>(count_assumed_calls) << "\n";
+    #if PRINT_LENGTH_ASSUMPTION_COMMENTS
+        std::cout << "\"Assumed\" calls, triggers, and percentage: " << count_assumed_calls << ", " << count_assumed_triggers << ", " << static_cast<double>(count_assumed_triggers)/static_cast<double>(count_assumed_calls) << "\n";
+    #endif // PRINT_LENGTH_ASSUMPTION_COMMENTS
 
     std::stringstream filename;
     filename << "day15_mapsize_" << map.size() << "_final_count_" << count << "_paths_" << paths.size() << ".txt";
