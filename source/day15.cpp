@@ -150,7 +150,8 @@ bool assume_the_optimal_path_doesnt_double_back_toooooo_much(coords_t_vec path)
 
     size_t length_of_shortest_path_thru_bounding_box = max_1st_idx + max_2nd_idx + 1;
     // size_t assumed_max_path_length = (length_of_shortest_path_thru_bounding_box * 7) / 4 + 1;
-    size_t assumed_max_path_length = (length_of_shortest_path_thru_bounding_box * 4) / 3 + 1;
+    // size_t assumed_max_path_length = (length_of_shortest_path_thru_bounding_box * 4) / 3 + 1;
+    size_t assumed_max_path_length = (length_of_shortest_path_thru_bounding_box * 7) / 5 + 1;
     size_t path_length = path.size();
     bool not_toooooo_long = path_length < assumed_max_path_length;
 
