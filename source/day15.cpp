@@ -164,11 +164,9 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
     }
 
     sll count = 0;
-    bool clear_dead_ends = false;
-    bool last_was_a_cleared_deadend = false;
     for (std::vector<coords_t_vec>::iterator path_iter = paths.begin(); path_iter != paths.end(); )
     {
-        if (++count % 100000 == 0 || (count > 2700000 && count % 100 == 0))
+        if (++count % 10000 == 0)// || (count > 2700000 && count % 100 == 0))
         {
             std::cout << count << " - paths.size() = " << paths.size() << "\n";
             if (true)
@@ -178,8 +176,6 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
                 print_path_map_to_file(filename.str(), paths, map.size());
             }
         }
-        clear_dead_ends = false;//last_was_a_cleared_deadend || count % 10000 == 0;
-        last_was_a_cleared_deadend = false;
 
         // Safety
         if (path_iter->empty())
@@ -197,21 +193,13 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
             continue;
         }
         coords_t_vec next_options = get_neighbors(cell, &map);
-        // next_options = remove_options_next_to_path(*path_iter, next_options);
         next_options = remove_options_next_to_path(*path_iter, next_options, &map, cell);
 
 
         // Make the new paths if there are any to make
         if (next_options.empty())
         {
-            // I have decided that not clearing deadends may the reason it's "faster" but also not optimal. We're only
-            // if (clear_dead_ends)
-            // {
-                path_iter = paths.erase(path_iter);
-            //     last_was_a_cleared_deadend = true;
-            // }
-            // else
-                // ++path_iter;
+            path_iter = paths.erase(path_iter);
             continue;
         }
         else
@@ -259,16 +247,6 @@ std::vector<coords_t_vec> plan_possible_paths(ints_t_2d map)
     }
     std::cout << "last count was " << count << ". paths.size() " << paths.size() << std::endl;
 
-    //Delete any paths that don't end at the end
-    for (std::vector<coords_t_vec>::iterator path_iter = paths.begin(); path_iter != paths.end(); )
-    {
-        coords_t cell = path_iter->at(path_iter->size() - 1);
-        if (cell.first != max_row || cell.second != max_col)
-            path_iter = paths.erase(path_iter);
-        else
-            ++path_iter;
-    }
-    std::cout << "After removing dead-ends, paths.size() " << paths.size() << std::endl;
     std::stringstream filename;
     filename << "day15_mapsize_" << map.size() << "_final_count_" << count << "_paths_" << paths.size() << ".txt";
     print_path_map_to_file(filename.str(), paths, map.size());
@@ -281,14 +259,50 @@ sll part1(ints_t_2d map)
     sll out = 0;
     if (paths.size() > 0)
         out = score_path(paths[0], map);
-    std::cout << paths.size() << " routes. Score = " << out << "\n";
+    std::cout << "Score = " << out << "\n";
     return out;
 }
 
-sll part2(ints_t_2d input)
+ints_t_2d tile_map(ints_t_2d map_in, size_t tiles)
 {
-    sll out = 0;
-    return out;
+    ints_t_2d complete_the_cols(map_in);
+    for (auto& line : complete_the_cols)
+    {
+        ints_t orig = line;
+        ints_t to_insert = orig;
+        for (size_t ii = 0; ii < tiles - 1; ++ii)
+        {
+            for (auto& elem : to_insert)
+                if (elem < 9)
+                    ++elem;
+                else
+                    elem = 1;
+            line.insert(line.end(), to_insert.begin(), to_insert.end());
+        }
+    }
+
+    ints_t_2d map_out(complete_the_cols);
+    for (size_t ii = 0; ii < tiles - 1; ++ii)
+    {
+        ints_t_2d to_insert = complete_the_cols;
+        for (auto& line : complete_the_cols)
+        {
+            for (auto& elem : line)
+                if (elem < 9)
+                    ++elem;
+                else
+                    elem = 1;
+        }
+        map_out.insert(map_out.end(), complete_the_cols.begin(), complete_the_cols.end());
+    }
+
+    return map_out;
+}
+
+sll part2(ints_t_2d input, size_t tiles)
+{
+    ints_t_2d map = tile_map(input, tiles);
+    return part1(map);
 }
 
 int main ()
@@ -309,27 +323,44 @@ int main ()
     std::cout << "4x4: ";
     sll res4 = part1(fourbyfour);
 
+    std::cout << "\n\nPart1\n\n";
+
     std::cout << "test: ";
     sll expected_test_result_1 = 40;
     sll results_test_1 = part1(test_data);
-    sll results_real_1 = 0;
+    sll results_real_1 = 498;
     std::cout << "Test result is " << results_test_1;
     if (results_test_1 == expected_test_result_1)
     {
         std::cout << ". Passed!\n";
         std::cout << "Real result is ";
-        results_real_1 = part1(real_data);
-        std::cout << "\n" << results_real_1 << std::endl;
+        // results_real_1 = part1(real_data); // 594 is too high. 435 is right for someone else. That was weird. Not 501. Took about 37 minutes.  498 !!!!!!!! So close before
+        std::cout << results_real_1 << std::endl;
     }
     else
         std::cout << ". Failed. Looking for " << expected_test_result_1 << "\n";
 
-    sll results_test_2 = part2(test_data);
-    sll results_real_2 = part2(real_data);
-    sll expected_test_result_2 = 0;
 
-    results(results_test_1, expected_test_result_1, results_real_1); //594 is too high. 435 is right for someone else. I tried 501. Nope. Took about 37 minutes.
-    results(results_test_2, expected_test_result_2, results_real_2);
+    std::cout << "\n\nPart2\n\n";
+    static constexpr size_t tiles = 5;
+    std::cout << "3x3 -> 15x15: ";
+    sll res3_part2 = part2(threebythree, tiles);
+    std::cout << "test: ";
+    sll expected_test_result_2 = 315;
+    sll results_test_2 = part2(test_data, tiles);
+    sll results_real_2 = 0;
+    std::cout << "Test result is " << results_test_2;
+    if (results_test_2 == expected_test_result_2)
+    {
+        std::cout << ". Passed!\n";
+        std::cout << "Real result is ";
+        results_real_2 = part2(real_data, tiles);
+        std::cout << results_real_2 << std::endl;
+    }
+    else
+        std::cout << ". Failed. Looking for " << expected_test_result_2 << "\n";
+
+
 
     return 0;
 }
