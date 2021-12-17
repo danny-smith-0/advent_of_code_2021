@@ -29,9 +29,6 @@ struct Trench
         for (int step_idx = 1; step_idx < x_steps.size(); ++step_idx)
             if (x_steps[step_idx] >= x_min && x_steps[step_idx] <= x_max)
             {
-                // ints_t step_and_location = {step_idx, x_steps[step_idx]};
-                // step_idxs.push_back(step_and_location);
-                // std::tuple<int, int, int> stepsize_nsteps_finallocation
                 results.push_back(std::make_tuple(x_step, step_idx, x_steps[step_idx]));
             }
         return results;
@@ -55,8 +52,6 @@ struct Trench
             ++step_idx;
             if (depth >= y_min && depth <= y_max)
             {
-                // ints_t step_and_location = {step_idx, depth};
-                // step_idxs.push_back(step_and_location);
                 results.push_back(std::make_tuple(y_step, step_idx, depth));
             }
         }
@@ -108,6 +103,7 @@ sll part1(Trench trench)
     }
 
     ints_t step_range = get_step_options_from_x(possible_x_stepsize_nsteps_ending);
+    int min_steps = step_range[0];
 
     //Find all possible y's
     std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending;
@@ -125,9 +121,10 @@ sll part1(Trench trench)
     for (auto stepsize_nsteps_ending : possible_y_stepsize_nsteps_ending)
     {
         int nsteps_y = std::get<1>(stepsize_nsteps_ending);
-        if (std::find(step_range.begin(), step_range.end(), nsteps_y) != step_range.end())
+        if (nsteps_y > min_steps)
         {
-            sll y_height = sum_of_first_n_integers(std::get<0>(stepsize_nsteps_ending));
+            int step_size = std::get<0>(stepsize_nsteps_ending);
+            sll y_height = sum_of_first_n_integers(step_size);
             max_y_height = y_height > max_y_height ? y_height : max_y_height;
         }
     }
@@ -147,15 +144,9 @@ int main ()
     Trench test_trench  = parse(get_strings_from_file("../inputs/day" + day_string + "_test.txt"));
     Trench real_trench  = parse(get_strings_from_file("../inputs/day" + day_string + ".txt"));
 
-    x_range( 0);
-    x_range( 1);
-    x_range( 2);
-    x_range( 3);
-    x_range( 9);
-    x_range( 20);
     std::cout << "\nPart 1\n\n";
     sll results_test_1 = part1(test_trench);
-    sll expected_test_result_1 = 0;
+    sll expected_test_result_1 = 45;
     if (results(results_test_1, expected_test_result_1))
     {
         sll results_real_1 = part1(real_trench);
@@ -166,7 +157,6 @@ int main ()
     sll results_test_2 = part2(test_trench);
     sll expected_test_result_2 = 0;
     if (results(results_test_2, expected_test_result_2))
-
     {
         sll results_real_2 = part2(real_trench);
         std::cout << "Real result is " << results_real_2 << "\n\nFinished" << std::endl;
