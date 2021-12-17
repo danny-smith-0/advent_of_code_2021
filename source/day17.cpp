@@ -57,6 +57,35 @@ struct Trench
         }
         return results;
     }
+
+    std::vector<std::tuple<int, int, int>> possible_x_stepsize_nsteps_ending()
+    {
+        std::vector<std::tuple<int, int, int>> possible_x_stepsize_nsteps_ending;
+        for (int x_stepsize = 1; x_stepsize <= this->x_max; ++x_stepsize)
+        {
+            std::vector<std::tuple<int, int, int>> stepsize_nsteps_ending = this->x_steps_in_x_range(x_stepsize);
+            if (!stepsize_nsteps_ending.empty())
+            {
+                possible_x_stepsize_nsteps_ending.insert(possible_x_stepsize_nsteps_ending.end(), stepsize_nsteps_ending.begin(), stepsize_nsteps_ending.end());
+            }
+        }
+        return possible_x_stepsize_nsteps_ending;
+    }
+
+    std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending()
+    {
+        std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending;
+        // Assuming y_min is negative. Also, y must be positive to reach the highest
+        for (int y_stepsize = 1; y_stepsize <= -this->y_min; ++y_stepsize)
+        {
+            std::vector<std::tuple<int, int, int>> stepsize_nsteps_ending = this->y_steps_in_y_range(y_stepsize);
+            if (!stepsize_nsteps_ending.empty())
+            {
+                possible_y_stepsize_nsteps_ending.insert(possible_y_stepsize_nsteps_ending.end(), stepsize_nsteps_ending.begin(), stepsize_nsteps_ending.end());
+            }
+        }
+        return possible_y_stepsize_nsteps_ending;
+    }
 };
 
 Trench parse(strings_t input)
@@ -92,30 +121,13 @@ ints_t get_step_options_from_x(std::vector<std::tuple<int, int, int>> possible_x
 sll part1(Trench trench)
 {
     //Find all possible x's
-    std::vector<std::tuple<int, int, int>> possible_x_stepsize_nsteps_ending;
-    for (int x_stepsize = 1; x_stepsize <= trench.x_max; ++x_stepsize)
-    {
-        std::vector<std::tuple<int, int, int>> stepsize_nsteps_ending = trench.x_steps_in_x_range(x_stepsize);
-        if (!stepsize_nsteps_ending.empty())
-        {
-            possible_x_stepsize_nsteps_ending.insert(possible_x_stepsize_nsteps_ending.end(), stepsize_nsteps_ending.begin(), stepsize_nsteps_ending.end());
-        }
-    }
+    std::vector<std::tuple<int, int, int>> possible_x_stepsize_nsteps_ending = trench.possible_x_stepsize_nsteps_ending();
+
+    //Find all possible y's
+    std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending = trench.possible_y_stepsize_nsteps_ending();
 
     ints_t step_range = get_step_options_from_x(possible_x_stepsize_nsteps_ending);
     int min_steps = step_range[0];
-
-    //Find all possible y's
-    std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending;
-    // Assuming y_min is negative. Also, y must be positive to reach the highest
-    for (int y_stepsize = 1; y_stepsize <= -trench.y_min; ++y_stepsize)
-    {
-        std::vector<std::tuple<int, int, int>> stepsize_nsteps_ending = trench.y_steps_in_y_range(y_stepsize);
-        if (!stepsize_nsteps_ending.empty())
-        {
-            possible_y_stepsize_nsteps_ending.insert(possible_y_stepsize_nsteps_ending.end(), stepsize_nsteps_ending.begin(), stepsize_nsteps_ending.end());
-        }
-    }
 
     sll max_y_height = 0;
     for (auto stepsize_nsteps_ending : possible_y_stepsize_nsteps_ending)
@@ -155,7 +167,7 @@ int main ()
 
     std::cout << "\nPart 2\n\n";
     sll results_test_2 = part2(test_trench);
-    sll expected_test_result_2 = 0;
+    sll expected_test_result_2 = 112;
     if (results(results_test_2, expected_test_result_2))
     {
         sll results_real_2 = part2(real_trench);
