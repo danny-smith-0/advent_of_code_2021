@@ -76,7 +76,7 @@ struct Trench
     {
         std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending;
         // Assuming y_min is negative. Also, y must be positive to reach the highest
-        for (int y_stepsize = 1; y_stepsize <= -this->y_min; ++y_stepsize)
+        for (int y_stepsize = this->y_min; y_stepsize <= -this->y_min; ++y_stepsize)
         {
             std::vector<std::tuple<int, int, int>> stepsize_nsteps_ending = this->y_steps_in_y_range(y_stepsize);
             if (!stepsize_nsteps_ending.empty())
@@ -127,13 +127,14 @@ sll part1(Trench trench)
     std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending = trench.possible_y_stepsize_nsteps_ending();
 
     ints_t step_range = get_step_options_from_x(possible_x_stepsize_nsteps_ending);
-    int min_steps = step_range[0];
+    //Max steps is hopefully one that hits zero x_vel in the trench. This is an assumption that thankfully works, but might not be guaranteed
+    int max_steps = step_range[step_range.size() - 1];
 
     sll max_y_height = 0;
     for (auto stepsize_nsteps_ending : possible_y_stepsize_nsteps_ending)
     {
         int nsteps_y = std::get<1>(stepsize_nsteps_ending);
-        if (nsteps_y > min_steps)
+        if (nsteps_y >= max_steps)
         {
             int step_size = std::get<0>(stepsize_nsteps_ending);
             sll y_height = sum_of_first_n_integers(step_size);
@@ -145,8 +146,30 @@ sll part1(Trench trench)
 
 sll part2(Trench trench)
 {
-    sll out = 0;
-    return out;
+    //Find all possible x's
+    std::vector<std::tuple<int, int, int>> possible_x_stepsize_nsteps_ending = trench.possible_x_stepsize_nsteps_ending();
+
+    //Find all possible y's
+    std::vector<std::tuple<int, int, int>> possible_y_stepsize_nsteps_ending = trench.possible_y_stepsize_nsteps_ending();
+
+    std::vector<std::pair<int, int>> velocities;
+    for (auto x_tuple : possible_x_stepsize_nsteps_ending)
+    {
+        int x_vel = std::get<0>(x_tuple);
+        int nsteps_x = std::get<1>(x_tuple);
+        for (auto y_tuple : possible_y_stepsize_nsteps_ending)
+        {
+            int y_vel = std::get<0>(y_tuple);
+            int nsteps_y = std::get<1>(y_tuple);
+            if (nsteps_y == nsteps_x || (nsteps_x == x_vel) && nsteps_y > nsteps_x)
+                velocities.push_back(std::make_pair(x_vel, y_vel));
+        }
+    }
+    std::sort(velocities.begin(), velocities.end());
+    auto last = std::unique(velocities.begin(), velocities.end());
+    velocities.erase(last, velocities.end());
+    sll total_velocities = velocities.size();
+    return total_velocities;
 }
 
 int main ()
