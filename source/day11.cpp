@@ -168,7 +168,7 @@ int main ()
         results_test_1 += step_octo_grid(&test_grid);
         results_real_1 += step_octo_grid(&real_grid);
     }
-    // print_ints_t_2d(test_grid);
+    // print_T_2d(test_grid);
 
     //reset
     test_grid = strings_of_digits_to_ints(test_data);
