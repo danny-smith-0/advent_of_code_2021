@@ -26,7 +26,7 @@ struct Trench
         std::vector<std::tuple<int, int, int>> results;
         ints_t_2d step_idxs;
         ints_t x_steps = x_range(x_step);
-        for (int step_idx = 1; step_idx < x_steps.size(); ++step_idx)
+        for (int step_idx = 1; step_idx < static_cast<int>(x_steps.size()); ++step_idx)
             if (x_steps[step_idx] >= x_min && x_steps[step_idx] <= x_max)
             {
                 results.push_back(std::make_tuple(x_step, step_idx, x_steps[step_idx]));
