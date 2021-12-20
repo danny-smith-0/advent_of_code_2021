@@ -94,8 +94,14 @@ sll part1(bools_t_2d const& input_image, bools_t const& algorithm)
 
 sll part2(bools_t_2d const& input_image, bools_t const& algorithm)
 {
-    sll out = 0;
-    return out;
+    bools_t_2d output(input_image);
+    size_t num_enhance = 50;
+    for (size_t ii = 0; ii < num_enhance; ++ii)
+    {
+        std::string infinite = algorithm[0] && (ii % 2 == 1) ? "1" : "0"; // Assumes algorithm[511] is false, which it is for now
+        output = enhance_image(output, algorithm, infinite);
+    }
+    return count_bools_t_2d(output);
 }
 
 int main ()
@@ -114,16 +120,16 @@ int main ()
     sll expected_test_result_1 = 35;
     if (results(results_test_1, expected_test_result_1))
     {
-        sll results_real_1 = part1(real_image, real_algo); //5431 and 5368 are too high
+        sll results_real_1 = part1(real_image, real_algo); // 5431 and 5368 are too high. It was 5347
         std::cout << "Real result is " << results_real_1 << std::endl;
     }
 
     std::cout << "\nPart 2\n\n";
     sll results_test_2 = part2(test_image, test_algo);
-    sll expected_test_result_2 = 0;
+    sll expected_test_result_2 = 3351;
     if (results(results_test_2, expected_test_result_2))
     {
-        sll results_real_2 = part2(real_image, real_algo);
+        sll results_real_2 = part2(real_image, real_algo); // 17172
         std::cout << "Real result is " << results_real_2 << "\n\nFinished" << std::endl;
     }
 
