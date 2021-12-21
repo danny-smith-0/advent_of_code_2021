@@ -1,7 +1,5 @@
 #include <advent_of_code.h>
 
-bool enhance_flipper = false;
-
 bools_t_2d parse(strings_t strs, bools_t &algorithm)
 {
     //First two lines are the algorithm and a blank line before the image
@@ -75,13 +73,11 @@ bools_t_2d enhance_image(bools_t_2d const& input_image, bools_t const& algorithm
     }
     padded_input.push_back(empty_row);
 
-
     bools_t_2d output (padded_input.size(), bools_t(padded_input.size(), pad_bool));
     for (size_t ii = 0; ii < output.size(); ++ii)
         for (size_t jj = 0; jj < output[ii].size(); ++jj)
             output[ii][jj] = get_pixel(padded_input, ii, jj, algorithm, infinite);
 
-    enhance_flipper = !enhance_flipper;
     return output;
 }
 
