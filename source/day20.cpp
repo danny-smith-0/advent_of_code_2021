@@ -97,6 +97,15 @@ sll part2(bools_t_2d const& input_image, bools_t const& algorithm)
         std::string infinite = algorithm[0] && (ii % 2 == 1) ? "1" : "0"; // Assumes algorithm[511] is false, which it is for now
         output = enhance_image(output, algorithm, infinite);
     }
+
+    std::ofstream outfile;
+    static bool test_run = true;
+    std::string type_of_file = test_run ? "_test" : "_real";
+    std::stringstream filename;
+    filename << "day20_enhance_" << num_enhance << type_of_file <<  "_dimension_" << output.size() << ".txt";
+    save_T_2d_to_file(output, filename.str(), false, true);
+    test_run = !test_run;
+
     return count_bools_t_2d(output);
 }
 
