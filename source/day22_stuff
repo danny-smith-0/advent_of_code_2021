@@ -1,0 +1,8 @@
+x min/min: -120100 120875. Range: 240976
+y min/min: -124565 118853. Range: 243419
+z min/min: -121762 119054. Range: 240817
+Parsing took 0.0322836 seconds.
+Test result is 0. Passed!
+x min/min: -90134 97678. Range: 187813
+y min/min: -96073 97039. Range: 193113
+z min/min: -97425 97383. Range: 194809
