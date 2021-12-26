@@ -23,3 +23,8 @@ target_link_libraries( aoc
     PUBLIC
     aoc_utils
 )
+
+target_compile_features(aoc
+	PRIVATE
+	cxx_std_17
+)
