@@ -110,25 +110,25 @@ void inp_to_ALU(Inp const& inp, sll w, ALU& alu)
         }
 
         if (parts[0] == "add")
-            alu.add(parts[1][0], b);
-        else if (parts[0] == "mul")
-            alu.mul(parts[1][0], b);
-        else if (parts[0] == "div")
-            alu.div(parts[1][0], static_cast<double>(b));
-        else if (parts[0] == "mod")
-            alu.mod(parts[1][0], b);
-        else if (parts[0] == "eql")
-            alu.eql(parts[1][0], b);
+                alu.add(parts[1][0], b);
+            else if (parts[0] == "mul")
+                alu.mul(parts[1][0], b);
+            else if (parts[0] == "div")
+                alu.div(parts[1][0], static_cast<double>(b));
+            else if (parts[0] == "mod")
+                alu.mod(parts[1][0], b);
+            else if (parts[0] == "eql")
+                alu.eql(parts[1][0], b);
+        }
     }
-}
 
-sll part1(std::vector<Inp> inps)
-{
-    steady_clock::time_point t1 = steady_clock::now();
-    sll biggest_number = 99999999999999;
-    while (1)
+    sll part1(std::vector<Inp> inps)
     {
-        if (biggest_number % 50000 == 0)
+        steady_clock::time_point t1 = steady_clock::now();
+        sll biggest_number = 99983995469999; //99994111111111 is too high. Ran down to 99983986900000 with no answer
+        while (1)
+        {
+            if (biggest_number % 50000 == 0)
         {
             steady_clock::time_point t2 = steady_clock::now();
             duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
