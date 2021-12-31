@@ -13,6 +13,7 @@ add_executable ( aoc
 	# source/day10.cpp
 	# source/day11.cpp
 	# source/day13.cpp
+	# source/day15.cpp
 
 	# source/day17.cpp
 	# source/day20.cpp
@@ -22,4 +23,9 @@ add_executable ( aoc
 target_link_libraries( aoc
     PUBLIC
     aoc_utils
+)
+
+target_compile_features(aoc
+	PRIVATE
+	cxx_std_17
 )
