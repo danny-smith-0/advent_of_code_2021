@@ -349,10 +349,22 @@ ints_t_2d tile_map(ints_t_2d map_in, size_t tiles)
     return map_out;
 }
 
+sll dijkstras_method_to_save_the_day(ints_t_2d map)
+{
+    // sll score = 0;//std::numeric_limits<sll>::max();
+    dijkstra::VertexTable vertex_table;
+    dijkstra::shortest_path(vertex_table, map);
+
+    coords_t goal (map.size() - 1, map[0].size() - 1);
+    sll score = vertex_table[goal].distance_from_start;
+    return score;
+}
+
 sll part2(ints_t_2d input, size_t tiles)
 {
     ints_t_2d map = tile_map(input, tiles);
-    return part1(map);
+    sll score = dijkstras_method_to_save_the_day(map);
+    return score;
 }
 
 int main ()
@@ -397,14 +409,13 @@ int main ()
     // sll res3_part2 = part2(threebythree, tiles);
     std::cout << "test: ";
     sll expected_test_result_2 = 315;
-    // sll results_test_2 = part2(test_data, tiles);
-    sll results_real_2 = 0;
-    std::cout << "Test result is " << 0;//results_test_2;
-    if (true)//results_test_2 == expected_test_result_2)
+    sll results_test_2 = part2(test_data, tiles);
+    std::cout << "Test result is " << results_test_2;
+    if (results_test_2 == expected_test_result_2)
     {
         std::cout << ". Passed!\n";
         std::cout << "Real result is ";
-        results_real_2 = part2(real_data, tiles);
+        sll results_real_2 = part2(real_data, tiles);
         std::cout << results_real_2 << std::endl; // 3188 is too high, 2096 is too low
     }
     else
